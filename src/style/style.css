@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: url("https://images.unsplash.com/photo-1596865249308-2472dc5807d7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=906&q=80");
+}
+
+h1 {
+    color: white;
+    font-family: 'Monoton', cursive;
+    font-size: 6rem;
+}
+
+#btnStart {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+h5.card-header {
+    width: 500px;
+}
+
+i.fas.fa-angle-double-right {
+    font-size: x-large;
+}
+.card {
+    transition: 1.5s ease;
+}
+
+div#modalBody {
+    display: flex;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+div#modalFooter {
+    display: flex;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-family: monospace;
+}
