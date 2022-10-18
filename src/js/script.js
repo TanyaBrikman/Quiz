@@ -105,7 +105,7 @@ $(document).ready(function() {
             '  <div class="d-flex justify-content-center align-items-center" style="height: 100vh">' +
             '    <div class="card" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="fade-in-right">' +
             '      <div class="progress" style="height: 6px;">' +
-            '        <div class="progress-bar bg-success" role="progressbar" style="width: 0;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>' +
+            '        <div class="progress-bar bg-success" role="progressbar" style="width: 0;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>' +
             '      </div>' +
             '      <h5 class="question-text card-header"></h5>' +
             '      <div class="card-body">' +
@@ -132,6 +132,10 @@ $(document).ready(function() {
 
         // Вставляем текст вопроса в элемент с классом question-text
         $questionText.text(question.text)
+
+        // Вычисляем и отображаем прогресс
+        let progress = Math.round((1.0 + questionIndex) / questions.length * 100)
+        $questionTemplate.find('.progress-bar').css('width', progress + '%')
 
         let hasNextQuestion = questionIndex < questions.length - 1
 
