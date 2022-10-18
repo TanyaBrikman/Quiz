@@ -1,318 +1,221 @@
 $(document).ready(function() {
 
-    let btnStart = $('#btnStart');
-    let containerStart = $('#containerStart');
-    let containerQuestion1 = $('#containerQuestion1');
-    let containerQuestion2 = $('#containerQuestion2');
-    let containerQuestion3 = $('#containerQuestion3');
-    let containerQuestion4 = $('#containerQuestion4');
-    let containerQuestion5 = $('#containerQuestion5');
-    let btnNext = $('.btn-success');
-    let modalBody = $('.modal-body');
-    let btnClose = $('.btn-close');
-    let modalFooter = $('.modal-footer');
-    let modal = $('.modal');
-
-
-    let count = 0;
-
-    btnStart.click(e => {
-        containerStart.toggle();
-    });
-
-    function getQuestion1() {
-
-        function showQuestion2() {
-            btnNext.click(() => {
-            containerQuestion1.hide();
-            containerQuestion2.show();
-            })
+    // Здесь у нас хранится база всех вопросов
+    let questions = [
+        {   
+            // Текст вопроса
+            text: 'Что на самом деле представляет из себя легендарный зеленый код из «Матрицы»?',
+            // Варианты ответов
+            options: [
+                'Рецепт пельменей',
+                'Рецепт Пад Тая',
+                'Рецепт суши',
+                'Рецепт Айдахо'
+            ],
+            // Индекс правильного ответа (именно индекс! отсчёт с нуля, так проще в коде)
+            answer: 2
+        },
+        {
+            text: 'Чего боятся люди, которые страдают алекторофобией?',
+            options: [
+                'Кур',
+                'Бороды',
+                'Автомобилей',
+                'Грозы'
+            ],
+            answer: 0
+        },
+        {
+            text: 'Этот предмет используют повара на своих показательных выступлениях, чтобы убедить зрителей в мастерстве аккуратной нарезки продуктов. Настоящие профи используют еще и гвозди! Что это за предмет?',
+            options: [
+                'Масло',
+                'Лист бумаги',
+                'Деревянный нож',
+                'Воздушный шарик'
+            ],
+            answer: 3
+        },
+        {
+            text: 'Из какого дерева получают сырье для аспирина?',
+            options: [
+                'Пихта',
+                'Акация',
+                'Граб',
+                'Ива'
+            ],
+            answer: 3
+        },
+        {
+            text: 'Основное сырье, из которого делают алкогольный напиток Бурбон?',
+            options: [
+                'Кукуруза',
+                'Просо',
+                'Ячмень',
+                'Овес'
+            ],
+            answer: 0
         }
+    ]
 
-        let ask1 = $('#ask1-1');
-        let ask2 = $('#ask1-2');
-        let ask3 = $('#ask1-3');
-        let ask4 = $('#ask1-4');
+    let $containerStart = $('#containerStart')
+    let $questionContainer = $('#questionContainer')
+    let $modalResult = $('#modalResult')
 
-        ask1.click(() => {
-            ask1.removeClass('btn btn-outline-secondary');
-            ask1.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion2();
-        })
+    // Индекс текущего вопроса
+    let questionIndex = 0
+    // Счётчик правильных ответов
+    let rightAnswers = 0
+    // Счётчик неправильных ответов
+    let wrongAnswers = 0
 
-        ask2.click(() => {
-            ask2.removeClass('btn btn-outline-secondary')
-            ask2.addClass('btn btn-danger');
-            ask1.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion2();
-        })
-        ask3.click(() => {
-            ask3.removeClass('btn btn-outline-secondary')
-            ask3.addClass('btn btn-success');
-            ask2.prop("disabled", true);
-            ask1.prop("disabled", true);
-            ask4.prop("disabled", true);
-            count++;
-            showQuestion2();
-        })
-        ask4.click(() => {
-            ask4.removeClass('btn btn-outline-secondary')
-            ask4.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask1.prop("disabled", true);
-            showQuestion2();
-        })
+    // На обе кнопки - "Старт" и "Попробовать ещё раз" - вешаем листенер, который перезапускает квиз
+    $containerStart.find('button').click(reset)
+    $modalResult.find('button').click(reset)
+
+    // Сброс счётчиков и перезапуск теста
+    function reset() {
+        // Скрываем начальную страницу
+        $containerStart.hide()
+        // Скрываем конечную модалку с результатом
+        $modalResult.modal('hide')
+        questionIndex = 0
+        rightAnswers = 0
+        wrongAnswers = 0
+        renderQuestion(questionIndex)
     }
 
-    getQuestion1();
+    // Функция принимает индекс вопроса, который необходимо показать,
+    // ищет данный вопрос в базе вопросов и отрисовывает его на экране
+    function renderQuestion(index) {
 
-    function getQuestion2 () {
+        // Ищем вопрос в базе
+        let question = questions[index]
+        if (!question) return
 
-        function showQuestion3() {
-            btnNext.click(() => {
-                containerQuestion2.hide();
-                containerQuestion3.show();
-            })
-        }
+        // Это шаблон вопроса. В jquery можно создать кусок html, 
+        // который потом можно будет вставить в index.html
+        let $questionTemplate = $(
+            '<div class="container">' +
+            '  <div class="d-flex justify-content-center align-items-center" style="height: 100vh">' +
+            '    <div class="card" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="fade-in-right">' +
+            '      <div class="progress" style="height: 6px;">' +
+            '        <div class="progress-bar bg-success" role="progressbar" style="width: 0;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>' +
+            '      </div>' +
+            '      <h5 class="question-text card-header"></h5>' +
+            '      <div class="card-body">' +
+            '        <div class="question-options d-grid gap-2"></div>' +
+            '      </div>' +
+            '      <div class="card text-center">' +
+            '        <div class="d-flex justify-content-center align-items-center">' +
+            '          <div class="card-footer text-muted">' +
+            '            <button type="button" class="button-next-question btn btn-success btn-rounded"></button>' +
+            '          </div>' +
+            '        </div>' +
+            '      </div>' +
+            '    </div>' +
+            '  </div>' +
+            '</div>'
+        )
 
-        let ask1 = $('#ask2-1');
-        let ask2 = $('#ask2-2');
-        let ask3 = $('#ask2-3');
-        let ask4 = $('#ask2-4');
+        // Внутри шаблона вопроса ищем объект с классом question-text - это будет текст вопроса
+        let $questionText = $questionTemplate.find('.question-text')
+        // Внутри шаблона вопроса ищем объект с классом question-options - это будет контейнер с вариантами ответов
+        let $optionsContainer = $questionTemplate.find('.question-options')
+        // Внутри шаблона вопроса ищем объект с классом question-text - это будет кнопка "Далее"
+        let $nextQuestionButton = $questionTemplate.find('.button-next-question')
 
-        ask1.click(() => {
-            ask1.removeClass('btn btn-outline-secondary');
-            ask1.addClass('btn btn-success');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            count++;
-            showQuestion3();
-        })
+        // Вставляем текст вопроса в элемент с классом question-text
+        $questionText.text(question.text)
 
-        ask2.click(() => {
-            ask2.removeClass('btn btn-outline-secondary')
-            ask2.addClass('btn btn-danger');
-            ask1.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion3();
-        })
-        ask3.click(() => {
-            ask3.removeClass('btn btn-outline-secondary')
-            ask3.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask1.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion3();
+        let hasNextQuestion = questionIndex < questions.length - 1
 
-        })
-        ask4.click(e => {
-            ask4.removeClass('btn btn-outline-secondary')
-            ask4.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask1.prop("disabled", true);
-            showQuestion3();
-        })
-    }
+        // В зависимости от того, будут ли ещё вопросы, или этот вопрос последний,
+        // выводим на кнопке "Далее" соответствующую надпись
+        $nextQuestionButton.text(hasNextQuestion ? 'Следующий вопрос' : 'Результат')
 
-    getQuestion2();
-
-    function getQuestion3 () {
-
-        function showQuestion4() {
-            btnNext.click(() => {
-                containerQuestion3.hide();
-                containerQuestion4.show();
-            });
-        }
-
-        let ask1 = $('#ask3-1');
-        let ask2 = $('#ask3-2');
-        let ask3 = $('#ask3-3');
-        let ask4 = $('#ask3-4');
-
-        ask1.click(e => {
-            ask1.removeClass('btn btn-outline-secondary');
-            ask1.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion4();
-
-        })
-
-        ask2.click(e => {
-            ask2.removeClass('btn btn-outline-secondary')
-            ask2.addClass('btn btn-danger');
-            ask1.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion4();
-        })
-        ask3.click(e => {
-            ask3.removeClass('btn btn-outline-secondary')
-            ask3.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask1.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion4();
-        })
-        ask4.click(e => {
-            ask4.removeClass('btn btn-outline-secondary')
-            ask4.addClass('btn btn-success');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask1.prop("disabled", true);
-            count++;
-            showQuestion4();
-        })
-    }
-
-    getQuestion3();
-
-    function getQuestion4 () {
-
-        function showQuestion5() {
-            btnNext.click(() => {
-                containerQuestion4.hide();
-                containerQuestion5.show();
-            });
-        }
-
-        let ask1 = $('#ask4-1');
-        let ask2 = $('#ask4-2');
-        let ask3 = $('#ask4-3');
-        let ask4 = $('#ask4-4');
-
-        ask1.click(e => {
-            ask1.removeClass('btn btn-outline-secondary');
-            ask1.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion5();
-        })
-
-        ask2.click(e => {
-            ask2.removeClass('btn btn-outline-secondary')
-            ask2.addClass('btn btn-danger');
-            ask1.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion5();
-        })
-        ask3.click(e => {
-            ask3.removeClass('btn btn-outline-secondary')
-            ask3.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask1.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuestion5();
-
-        })
-        ask4.click(e => {
-            ask4.removeClass('btn btn-outline-secondary')
-            ask4.addClass('btn btn-success');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask1.prop("disabled", true);
-            count++;
-            showQuestion5();
-        })
-    }
-
-    getQuestion4();
-
-    function getQuestion5 () {
-
-        function showQuizIsOver() {
-            btnNext.click(() => {
-                containerQuestion5.hide();
-            });
-        }
-
-        let ask1 = $('#ask5-1');
-        let ask2 = $('#ask5-2');
-        let ask3 = $('#ask5-3');
-        let ask4 = $('#ask5-4');
-
-        ask1.click(e => {
-            ask1.removeClass('btn btn-outline-secondary');
-            ask1.addClass('btn btn-success');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            count++;
-            showQuizIsOver();
-        })
-
-        ask2.click(e => {
-            ask2.removeClass('btn btn-outline-secondary')
-            ask2.addClass('btn btn-danger');
-            ask1.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuizIsOver();
-
-        })
-        ask3.click(e => {
-            ask3.removeClass('btn btn-outline-secondary')
-            ask3.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask1.prop("disabled", true);
-            ask4.prop("disabled", true);
-            showQuizIsOver();
-        })
-        ask4.click(e => {
-            ask4.removeClass('btn btn-outline-secondary')
-            ask4.addClass('btn btn-danger');
-            ask2.prop("disabled", true);
-            ask3.prop("disabled", true);
-            ask1.prop("disabled", true);
-            showQuizIsOver();
-        })
-    }
-
-    getQuestion5();
-
-    function getResult () {
-        $('#btnResult').click(e => {
-            if (count === 0) {
-                modalBody.html('0 баллов');
-                modalFooter.html('Ты можешь лучше!');
-            } else if (count === 1) {
-                modalBody.html('1 балл');
-                modalFooter.html('Ты можешь лучше!')
-            } else if (count === 2) {
-                modalBody.html('2 балла');
-                modalFooter.html('Ты можешь лучше!')
-            } else if (count === 3) {
-                modalBody.html('3 балла');
-                modalFooter.html('Неплохо!')
-            } else if (count === 4) {
-                modalBody.html('4 балла');
-                modalFooter.html('Хороший результат!')
-            } else if (count === 5) {
-                modalBody.html('5 баллов');
-                modalFooter.html('Ты истинный гений!')
+        // Выключаем кнопку "Далее"
+        $nextQuestionButton.prop('disabled', true)
+        // Кнопке "Далее" на клик назначаем листенер, который:
+        $nextQuestionButton.click(e => {
+            // ... увеличивает счётчик текущего вопроса (переходим на следующий вопрос)
+            questionIndex++
+            // проверяем: если мы ещё НЕ дошли до конца квиза
+            if (hasNextQuestion) {
+                // ... показываем следующий вопрос
+                renderQuestion(questionIndex)
+            } else {
+                // ... иначе очищаем контейнер с вопросом
+                $questionContainer.empty()
+                // и показываем окошко с результатом
+                renderResult()
             }
         })
+
+        let rightAnswer = question.answer
+
+        // Рисуем варианты ответов
+        for (let optionIndex in question.options) {
+            let optionText = question.options[optionIndex]
+
+            // Это шаблон для варианта ответа
+            let $optionTemplate = $('<button type="button" class="question-option btn btn-outline-secondary" data-mdb-ripple-color="dark"></button>')
+            // Прописываем в него текст варианта ответа
+            $optionTemplate.text(optionText)
+
+            // На клик назначаем листенер, который:
+            $optionTemplate.click(e => {
+                // ... проверяет, если был кликнут правильный вариант ответа:
+                if (optionIndex == rightAnswer) {
+                    // ... увеличивает счётчик правильных ответов
+                    rightAnswers++
+                    // и помечает кнопку зелёным цветом
+                    $optionTemplate.addClass('btn-success')
+                } else {
+                    // ... иначе увеличивает счётчик неправильных ответов
+                    wrongAnswers++
+                    // и помечает кнопку красным цветом
+                    $optionTemplate.addClass('btn-danger')
+                }
+                // В контейнере СО ВСЕМИ ВАРИАНТАМИ ОТВЕТОВ находим все варианты и выключаем их
+                $optionsContainer.find('.question-option').prop('disabled', true)
+                // Размораживаем кнопку "Далее"
+                $nextQuestionButton.prop('disabled', false)
+            })
+
+            // Добавляем собранную опцию в шаблон вопроса
+            $optionsContainer.append($optionTemplate)
+        }
+
+        // ОЧИЩАЕМ КОНТЕЙНЕР С ВОПРОСОМ (там мог быть предыдущий вопрос) 
+        // и добавляем в него новый собранный вопрос (в этот момент он отобразится в index.html)
+        $questionContainer.empty().append($questionTemplate)
     }
 
-    getResult();
+    function renderResult() {
+        let result
 
-    btnClose.click(e => {
-        modal.hide();
-        $('#btnResult').hide();
-        window.location.reload();
-    })
+        // Вычисляем "оценку" на основании ДОЛИ правильных ответов
+        if (rightAnswers < questions.length * 0.2) {
+             // 20% правильных ответов
+            result = 'Ужасно!'
+        } else if (rightAnswers < questions.length * 0.5) {
+            // 50% правильных ответов
+            result = 'Такое соби...'
+        } else if (rightAnswers < questions.length * 0.7) {
+            // 70% правильных ответов
+            result = 'Неплохо!'
+        } else if (rightAnswers < questions.length * 0.9) {
+            // 90% правильных ответов
+            result = 'Хороший результат!'
+        } else {
+            // > 90% правильных ответов
+            result = 'Ты истинный гений!'
+        }
 
+        $modalResult.find('.modal-header').text(result)
+        $modalResult.find('.modal-body').text('Правильных ответов: ' + rightAnswers + ' / ' + questions.length)
+
+        // Показываем модалку с результатом
+        $modalResult.modal('show')
+    }
 })
