@@ -127,7 +127,7 @@ $(document).ready(function() {
         let $questionText = $questionTemplate.find('.question-text')
         // Внутри шаблона вопроса ищем объект с классом question-options - это будет контейнер с вариантами ответов
         let $optionsContainer = $questionTemplate.find('.question-options')
-        // Внутри шаблона вопроса ищем объект с классом question-text - это будет кнопка "Далее"
+        // Внутри шаблона вопроса ищем объект с классом button-next-question - это будет кнопка "Далее"
         let $nextQuestionButton = $questionTemplate.find('.button-next-question')
 
         // Вставляем текст вопроса в элемент с классом question-text
@@ -168,7 +168,7 @@ $(document).ready(function() {
             let optionText = question.options[optionIndex]
 
             // Это шаблон для варианта ответа
-            let $optionTemplate = $('<button type="button" class="question-option btn btn-outline-secondary" data-mdb-ripple-color="dark"></button>')
+            let $optionTemplate = $('<button type="button" class="question-option btn btn-outline-secondary" data-mdb-ripple-color="dark" style="color: black"></button>')
             // Прописываем в него текст варианта ответа
             $optionTemplate.text(optionText)
 
@@ -186,8 +186,10 @@ $(document).ready(function() {
                     // и помечает кнопку красным цветом
                     $optionTemplate.addClass('btn-danger')
                 }
+                $optionsContainer.find('.question-option').not($(e.target)).prop('disabled', true)
+
+
                 // В контейнере СО ВСЕМИ ВАРИАНТАМИ ОТВЕТОВ находим все варианты и выключаем их
-                $optionsContainer.find('.question-option').prop('disabled', true)
                 // Размораживаем кнопку "Далее"
                 $nextQuestionButton.prop('disabled', false)
             })
