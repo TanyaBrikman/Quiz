@@ -186,12 +186,11 @@ $(document).ready(function() {
                     // и помечает кнопку красным цветом
                     $optionTemplate.addClass('btn-danger')
                 }
-                $optionsContainer.find('.question-option').not($(e.target)).prop('disabled', true)
-
-
                 // В контейнере СО ВСЕМИ ВАРИАНТАМИ ОТВЕТОВ находим все варианты и выключаем их
+                $optionsContainer.find('.question-option').not($optionTemplate).prop('disabled', true)
                 // Размораживаем кнопку "Далее"
                 $nextQuestionButton.prop('disabled', false)
+                $(e.target).blur()
             })
 
             // Добавляем собранную опцию в шаблон вопроса

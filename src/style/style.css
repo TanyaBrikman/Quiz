@@ -45,3 +45,13 @@ div#modalFooter {
     font-size: 1.4rem;
     font-family: monospace;
 }
+
+.btn-success:hover {
+    background-color: #118d42 !important;
+    color: #fff !important;
+}
+
+.btn-danger:hover {
+    background-color: #d83752 !important;
+    color: #fff !important;
+}
